@@ -14,7 +14,7 @@ app.get("/compile", async (req, res) => {
 
   try {
     // Send request to the Compiler service
-    const response = await axios.post("http://192.168.1.7:5000/compile", {
+    const response = await axios.post("https://8c0e-203-212-202-185.ngrok-free.app/compile", {
       language: language
     });
   
