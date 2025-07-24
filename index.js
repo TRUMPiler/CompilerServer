@@ -29,20 +29,28 @@ app.post("/user/login", async (req, res) => {
         await client.connect();
         const db = client.db("GG");
         const result = await userModal.loginUser(db, email, password);
-        res.status(200).json(result);
+        if (result.success) {
+            res.status(200).json(result);
+        } else {
+            res.status(401).json(result);
+        }
     } catch (error) {
         console.log(error);
-        res.status(401).json({ success: false, error: 'Invalid email or password' });
+        res.status(401).json({ sucess: false, error: 'Invalid email or password' });
     }
 });
-app.post("/user/registration", async (req, res) => {
+app.post("/user/register", async (req, res) => {
     const { name, email, password, confirmPassword, image } = req.body;
     try {
         const client = new mongodb.MongoClient(URI);
         await client.connect();
         const db = client.db("GG");
         const result = await userModal.registerUser(db, { name, email, password, confirmPassword, image });
-        res.status(201).json({ message: 'User registered successfully', userId: result.insertedId });
+        if (result.sucess) {
+            res.status(201).json(result);
+        } else {
+            res.status(400).json(result);
+        }
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error registering user' });
@@ -68,16 +76,16 @@ app.post("/user/registration", async (req, res) => {
 
 // Note routes
 app.post("/note/add", async (req, res) => {
-    const { code, language, userId } = req.body;
+    const { code, language, userId, Title } = req.body;
     try {
         const client = new mongodb.MongoClient(URI);
         await client.connect();
         const db = client.db("GG");
-        const result = await noteModal.addNote(db, { code, language, userId });
-        res.status(201).json({ message: 'Note added successfully', noteId: result.insertedId });
+        const result = await noteModal.noteModal.addNote(db, { code, language, userId,Title });
+        res.status(201).json({ success: true,message: 'Note added successfully', noteId: result.insertedId });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: 'Error adding note' });
+        res.status(500).json({ success: false,error: 'Error adding note' });
     }
 });
 app.post("/note/update", async (req, res) => {
@@ -106,7 +114,7 @@ app.post("/note/delete", async (req, res) => {
         res.status(500).json({ error: 'Error deleting note' });
     }
 });
-app.post("/note/get", async (req, res) => {
+app.get("/note/get", async (req, res) => {
     const { noteId } = req.body;
     try {
         const client = new mongodb.MongoClient(URI);
@@ -125,8 +133,10 @@ app.post("/note/getall", async (req, res) => {
         const client = new mongodb.MongoClient(URI);
         await client.connect();
         const db = client.db("GG");
-        const result = await noteModal.getAllNotes(db, userId);
+        const result = await noteModal.noteModal.getAllNotes(db, userId);
         res.status(200).json(result);
+        
+        
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error getting notes' });

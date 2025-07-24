@@ -1,6 +1,7 @@
 const COLLECTION_NAME = 'Notes';
+const mongodb=require('mongodb');
 const noteModal = {
-    title: { type: String, required: true },
+    Title: { type: String, required: true },
     content: { type: String, required: true },
     userId: { type: String, required: true },
     language: { type: String, required: true },
@@ -12,7 +13,9 @@ const noteModal = {
     addNote: async function (db,note) {
         try {
             db = db.collection(COLLECTION_NAME);
-            
+           const date = new Date();
+           
+note.date = date.toISOString().slice(0, 10);    
             const result = await db.insertOne(note);
             console.log(result);
             return result;
@@ -62,10 +65,11 @@ const noteModal = {
             throw error;
         }
     },
-    getAllNotes: async function (db,userid) {
+    getAllNotes: async function (db,userId) {
         try {
+               
             db = db.collection(COLLECTION_NAME);
-            const result = await db.find({ userId: userid }).toArray();
+            const result = await db.find({ "userId": userId }).toArray();
             return result;
         } catch (error) {
             console.error('Error getting all notes:', error);
